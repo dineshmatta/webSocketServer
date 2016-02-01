@@ -13,6 +13,7 @@ socketServer( 'example', function ( connection, server ) {
 
   connection.on('open', function ( id ) {
     console.log('[open]');
+    console.log(id);
   });
 
   connection.on('message', function ( msg ) {
@@ -24,9 +25,22 @@ socketServer( 'example', function ( connection, server ) {
 
     var channel = msgData.action.data[0].channel;
 
+    //console.log(server.connections);
+    console.log(Object.keys(server.connections)); // client ids
+    console.log(connection.id); // client id
+
     client.hmset(channel, msgData, function(err, result){
-      if(!err)
-        connection.send( msg.utf8Data );  
+      if(!err){
+        //connection.send( msg.utf8Data ); 
+        var keys = Object.keys(server.connections);
+        for (var j=0; j<keys.length; j++) {
+            var key = keys[j];
+            var value = server.connections[key];
+            //console.log(value);
+            msg.utf8Data.id = key;
+            value.send( msg.utf8Data );
+        } 
+      }
     });
 
     
