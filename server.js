@@ -25,21 +25,22 @@ socketServer( 'example', function ( connection, server ) {
 
     var channel = msgData.action.data[0].channel;
 
-    //console.log(server.connections);
     console.log(Object.keys(server.connections)); // client ids
     console.log(connection.id); // client id
 
     client.hmset(channel, msgData, function(err, result){
       if(!err){
-        //connection.send( msg.utf8Data ); 
+        //connection.sendUTF( msg.utf8Data ); 
         var keys = Object.keys(server.connections);
         for (var j=0; j<keys.length; j++) {
-            var key = keys[j];
-            var value = server.connections[key];
-            //console.log(value);
-            msg.utf8Data.id = key;
-            value.send( msg.utf8Data );
+
+          var key = keys[j];
+          var value = server.connections[key];
+
+          msgData.id = key;
+          value.send( JSON.stringify(msgData) );
         } 
+
       }
     });
 
